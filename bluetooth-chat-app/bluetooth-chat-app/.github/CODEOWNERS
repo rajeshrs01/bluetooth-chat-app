@@ -1,0 +1,16 @@
+# CODEOWNERS
+# Each line: file pattern → GitHub username(s) who must review PRs touching those files.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+*                           @YOUR_USERNAME
+
+# Core Bluetooth logic — needs careful review
+src/core/bluetooth_manager.py   @YOUR_USERNAME
+src/core/audio_manager.py       @YOUR_USERNAME
+
+# Encryption — security-sensitive
+src/core/encryption.py          @YOUR_USERNAME
+
+# CI / GitHub Actions
+.github/workflows/              @YOUR_USERNAME

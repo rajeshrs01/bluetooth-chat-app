@@ -1,0 +1,71 @@
+name: Release signed APK
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Build and release signed APK
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk autoconf libtool \
+            pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev \
+            libtinfo5 cmake libffi-dev libssl-dev build-essential
+
+      - name: Cache Buildozer
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: buildozer-${{ hashFiles('buildozer.spec') }}
+
+      - name: Install Buildozer
+        run: pip install buildozer==1.5.0 kivy==2.2.1 bleak cryptography cython
+
+      - name: Build release APK
+        run: buildozer android release
+
+      # ── Sign the APK with keystore stored in GitHub Secrets ─────
+      - name: Sign APK
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > bluechat.keystore
+          APK=$(ls bin/*-release-unsigned.apk | head -1)
+          jarsigner -verbose \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            -keystore bluechat.keystore \
+            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+            -keypass   "${{ secrets.KEY_PASSWORD }}" \
+            "$APK" "${{ secrets.KEY_ALIAS }}"
+          mkdir -p artifacts
+          cp "$APK" "artifacts/BlueChat-${{ github.ref_name }}-release.apk"
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.apk
+          generate_release_notes: true
+          body: |
+            ## BlueChat ${{ github.ref_name }} — Production release
+
+            ### Install
+            Download the APK below → open on your Android phone → tap Install.
+
+            ### What's new
+            See CHANGELOG.md for full details.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

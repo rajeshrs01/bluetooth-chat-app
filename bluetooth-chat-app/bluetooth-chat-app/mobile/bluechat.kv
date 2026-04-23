@@ -1,0 +1,296 @@
+#:kivy 2.2
+
+# ── Colour palette ──────────────────────────────────────────────
+# Primary blue  : 0.094, 0.373, 0.647, 1     (#185FA5)
+# Teal accent   : 0.059, 0.431, 0.337, 1     (#0F6E56)
+# Surface       : 0.957, 0.957, 0.941, 1     (#F4F4F0)
+# Dark surface  : 0.173, 0.173, 0.165, 1     (#2C2C2A)
+# Text primary  : 0.173, 0.173, 0.165, 1
+# Text secondary: 0.537, 0.529, 0.502, 1
+
+<RoundedButton@Button>:
+    background_color: 0, 0, 0, 0
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (0.094, 0.373, 0.647, 1) if self.state == 'normal' else (0.059, 0.431, 0.337, 1)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+    color: 1, 1, 1, 1
+    font_size: '15sp'
+    bold: True
+    size_hint_y: None
+    height: '48dp'
+
+<SecondaryButton@Button>:
+    background_color: 0, 0, 0, 0
+    background_normal: ''
+    canvas.before:
+        Color:
+            rgba: (0.878, 0.878, 0.863, 1) if self.state == 'normal' else (0.800, 0.800, 0.784, 1)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [10]
+    color: 0.173, 0.173, 0.165, 1
+    font_size: '14sp'
+    size_hint_y: None
+    height: '44dp'
+
+<MessageBubble@BoxLayout>:
+    is_mine: False
+    msg_text: ''
+    msg_time: ''
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: [0, 4, 0, 4]
+
+<ScanItem@BoxLayout>:
+    device_name: ''
+    device_addr: ''
+    device_rssi: ''
+    index: 0
+    on_select: None
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '64dp'
+    padding: [0, 4]
+    spacing: 12
+    canvas.before:
+        Color:
+            rgba: 0.957, 0.957, 0.941, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+# ── Screen Manager ───────────────────────────────────────────────
+ScreenManager:
+    HomeScreen:
+    ScanScreen:
+    ChatScreen:
+
+# ── Home Screen ──────────────────────────────────────────────────
+<HomeScreen>:
+    name: 'home'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '24dp'
+        spacing: '20dp'
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Widget:
+            size_hint_y: None
+            height: '40dp'
+
+        Label:
+            text: 'BlueChat'
+            font_size: '32sp'
+            bold: True
+            color: 0.094, 0.373, 0.647, 1
+            size_hint_y: None
+            height: '44dp'
+
+        Label:
+            text: 'Bluetooth Chat & Voice'
+            font_size: '15sp'
+            color: 0.537, 0.529, 0.502, 1
+            size_hint_y: None
+            height: '24dp'
+
+        Widget:
+            size_hint_y: None
+            height: '32dp'
+
+        RoundedButton:
+            text: 'Find & connect to a device'
+            on_release: root.go_scan()
+
+        SecondaryButton:
+            text: 'My contacts'
+            on_release: root.go_contacts()
+
+        Widget:
+
+        Label:
+            text: 'Bluetooth must be enabled on both devices'
+            font_size: '12sp'
+            color: 0.7, 0.7, 0.7, 1
+            size_hint_y: None
+            height: '20dp'
+
+# ── Scan Screen ──────────────────────────────────────────────────
+<ScanScreen>:
+    name: 'scan'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            size_hint_y: None
+            height: '56dp'
+            padding: ['12dp', '8dp']
+            spacing: '8dp'
+            canvas.before:
+                Color:
+                    rgba: 0.094, 0.373, 0.647, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: '<'
+                size_hint_x: None
+                width: '40dp'
+                background_color: 0,0,0,0
+                color: 1,1,1,1
+                font_size: '22sp'
+                on_release: app.root.current = 'home'
+
+            Label:
+                text: 'Find devices'
+                font_size: '18sp'
+                bold: True
+                color: 1, 1, 1, 1
+
+        Label:
+            id: scan_status
+            text: 'Tap scan to find nearby devices'
+            font_size: '13sp'
+            color: 0.537, 0.529, 0.502, 1
+            size_hint_y: None
+            height: '40dp'
+
+        ScrollView:
+            id: scan_scroll
+            GridLayout:
+                id: device_list
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '2dp'
+                padding: ['12dp', '4dp']
+
+        BoxLayout:
+            size_hint_y: None
+            height: '72dp'
+            padding: ['16dp', '8dp']
+            spacing: '12dp'
+
+            RoundedButton:
+                id: scan_btn
+                text: 'Scan for devices'
+                on_release: root.start_scan()
+
+# ── Chat Screen ──────────────────────────────────────────────────
+<ChatScreen>:
+    name: 'chat'
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: 0.957, 0.957, 0.941, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        BoxLayout:
+            size_hint_y: None
+            height: '56dp'
+            padding: ['12dp', '8dp']
+            spacing: '8dp'
+            canvas.before:
+                Color:
+                    rgba: 0.094, 0.373, 0.647, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: '<'
+                size_hint_x: None
+                width: '40dp'
+                background_color: 0,0,0,0
+                color: 1,1,1,1
+                font_size: '22sp'
+                on_release: root.disconnect()
+
+            Label:
+                id: chat_title
+                text: 'Chat'
+                font_size: '17sp'
+                bold: True
+                color: 1, 1, 1, 1
+
+            Label:
+                id: status_dot
+                text: '● Connected'
+                font_size: '12sp'
+                color: 0.557, 0.941, 0.710, 1
+                size_hint_x: None
+                width: '100dp'
+
+        ScrollView:
+            id: chat_scroll
+            do_scroll_x: False
+            GridLayout:
+                id: chat_messages
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '4dp'
+                padding: ['12dp', '8dp']
+
+        BoxLayout:
+            size_hint_y: None
+            height: '64dp'
+            padding: ['12dp', '8dp']
+            spacing: '8dp'
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            TextInput:
+                id: msg_input
+                hint_text: 'Type a message...'
+                multiline: False
+                font_size: '15sp'
+                background_color: 0.957, 0.957, 0.941, 1
+                foreground_color: 0.173, 0.173, 0.165, 1
+                cursor_color: 0.094, 0.373, 0.647, 1
+                padding: ['12dp', '10dp']
+                on_text_validate: root.send_message()
+
+            Button:
+                size_hint_x: None
+                width: '56dp'
+                background_color: 0, 0, 0, 0
+                background_normal: ''
+                on_release: root.send_message()
+                canvas.before:
+                    Color:
+                        rgba: (0.094, 0.373, 0.647, 1)
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [10]
+                Label:
+                    text: 'Send'
+                    font_size: '13sp'
+                    bold: True
+                    color: 1, 1, 1, 1

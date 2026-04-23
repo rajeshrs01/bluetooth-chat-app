@@ -1,0 +1,10 @@
+# Mobile / Android requirements
+# Install these when developing the Kivy app on your PC before building APK
+
+kivy==2.2.1
+bleak==0.21.1
+cryptography>=42.0.0
+buildozer==1.5.0
+
+# For running mobile UI on desktop during development
+kivy[base]==2.2.1

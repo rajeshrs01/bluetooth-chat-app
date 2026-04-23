@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.debugpy",
+    "ms-python.black-formatter",
+    "ms-python.flake8",
+    "ms-python.isort",
+    "ms-python.vscode-pylance",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "GitHub.vscode-pull-request-github",
+    "streetsidesoftware.code-spell-checker",
+    "christian-kohler.path-intellisense",
+    "njpwerner.autodocstring"
+  ]
+}
